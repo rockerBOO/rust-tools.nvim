@@ -24,7 +24,7 @@ using `packer.nvim`
 
 ```lua
 use 'neovim/nvim-lspconfig'
-use 'Ciel-MC/rust-tools.nvim'
+use 'rockerBOO/rust-tools.nvim'
 
 -- Debugging
 use 'nvim-lua/plenary.nvim'
