@@ -7,12 +7,17 @@ _G.rust_tools_get_graphviz_backends = function()
   return M.options.tools.crate_graph.enabled_graphviz_backends
 end
 
-local defaults = {
+--- @class RustToolsOptions
+M.options = {
   tools = { -- rust-tools options
 
     -- how to execute terminal commands
     -- options right now: termopen / quickfix / toggleterm / vimux
     executor = require("rust-tools.executors").termopen,
+
+    -- Customize how web browser is launched
+    -- Useful for when netrw is disabled
+    browser = function(url) vim.fn["netrw#BrowseX"](url, 0) end,
 
     -- callback to execute once rust-analyzer is done initializing the workspace
     -- The callback receives one parameter indicating the `health` of the server: "ok" | "warning" | "error"
@@ -20,6 +25,10 @@ local defaults = {
 
     -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
     reload_workspace_from_cargo_toml = true,
+
+    -- Automatically adds the manifest path of your current buffer to the `Cargo command` instead of using the cwd
+    -- This is helpful for things like monorepos where your cwd may not necessarily be the root of the workspace
+    cargo_wrapper = true,
 
     -- These apply to the default RustSetInlayHints command
     inlay_hints = {
@@ -60,20 +69,6 @@ local defaults = {
 
     -- options same as lsp hover / vim.lsp.util.open_floating_preview()
     hover_actions = {
-
-      -- the border that is used for the hover window
-      -- see vim.api.nvim_open_win()
-      border = {
-        { "╭", "FloatBorder" },
-        { "─", "FloatBorder" },
-        { "╮", "FloatBorder" },
-        { "│", "FloatBorder" },
-        { "╯", "FloatBorder" },
-        { "─", "FloatBorder" },
-        { "╰", "FloatBorder" },
-        { "│", "FloatBorder" },
-      },
-
       -- Maximal width of the hover window. Nil means no max.
       max_width = nil,
 
@@ -181,15 +176,9 @@ local defaults = {
     },
   },
 }
-
-M.options = {
-  tools = {},
-  server = {},
-  dap = {},
-}
-
+--- @param options RustToolsOptions
 function M.setup(options)
-  M.options = vim.tbl_deep_extend("force", {}, defaults, options or {})
+  M.options = vim.tbl_deep_extend("force", M.options, options)
 end
 
 return M
